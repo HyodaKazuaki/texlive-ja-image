@@ -1,0 +1,35 @@
+name: test
+
+on:
+    push:
+    pull_request:
+        branches:
+            - "**"
+    workflow_dispatch:
+
+defaults:
+    run:
+        shell: bash
+
+jobs:
+    build-test:
+        runs-on: ubuntu-22.04
+        strategy:
+            matrix:
+                version: [2023, 2022, 2021, 2020, 2019]
+                option: ["default", "full"]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: Setup QEMU
+              uses: docker/setup-qemu-action@v2
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v2
+            - name: Build
+              uses: docker/build-push-action@v4
+              with:
+                context: .
+                build-args: |
+                    version=${{ matrix.version }}
+                    option=${{ matrix.option }}
+                push: false
