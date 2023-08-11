@@ -39,7 +39,7 @@ RUN <<EOF
 
    # Check final installer existence.
    existfin=0
-   curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${version}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
+   curl --retry 3 -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${version}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
    
    # Set download url.
    url="ftp://tug.org/historic/systems/texlive/${version}/"
@@ -48,7 +48,7 @@ RUN <<EOF
    fi
    url=${url}install-tl-unx.tar.gz
 
-   curl -u anonymous:FTP ${url} | tar -xz --strip-components=1
+   curl --retry 3 --ftp-pasv -u anonymous:FTP ${url} | tar -xz --strip-components=1
 
    # Set mirror url.
    # We use mirror usualy to use fastest repository, but there is no mirror for older versions.
