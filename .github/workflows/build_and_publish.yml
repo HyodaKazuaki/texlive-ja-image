@@ -32,6 +32,16 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Maximize build disk space
+        uses: easimon/maximize-build-space@v8
+        with:
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+          remove-codeql: true
+      - name: Cleanup Docker image
+        shell: bash
+        run:  docker image prune --force
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check final ISO file existence
@@ -92,9 +102,6 @@ jobs:
             type=raw, value=${{ matrix.version }}, enable=${{ env.DEFAULT_OPTION == matrix.option }}
             type=raw, value=${{ matrix.version }}-{{sha}}, enable=${{ env.DEFAULT_OPTION == matrix.option }}
             type=raw, value=latest, enable=${{ env.DEFAULT_OPTION == matrix.option && env.DEFAULT_VERSION == matrix.version }}
-      - name: Cleanup Docker image
-        shell: bash
-        run:  docker image prune --force
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
