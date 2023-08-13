@@ -42,7 +42,7 @@ jobs:
 
           # Check final ISO file existence.
           existfin=0
-          curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/texlive.iso
+          curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/texlive.iso || existfin=$?
 
           echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
       - name: Cache ISO file
