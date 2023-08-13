@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1.6
 
+ARG builder_name=from_iso
+ARG iso_dir=texlive
 ARG version=2023
 ARG arch=x86_64-linux
 ARG option=full
@@ -9,8 +11,37 @@ ARG GROUPNAME=user
 ARG UID=1000
 ARG GID=1000
 
-# Build TeXLive
-FROM debian:buster AS builder
+
+# Build TeXLive from iso
+FROM debian:buster AS from_iso
+
+ARG iso_dir
+ARG version
+ARG option
+
+# Move to /tmp
+WORKDIR /tmp
+
+# Add profile
+COPY profiles/${version}/${option}/texlive.profile /tmp/
+
+# Add ISO data
+COPY ${iso_dir} /tmp
+
+# Install dependency
+RUN <<EOF
+   set -eux
+
+   apt-get update
+   apt-get install -y perl
+EOF
+
+# Install TeXLive
+RUN ./install-tl -profile=texlive.profile
+
+
+# Build TeXLive from net
+FROM debian:buster AS from_net
 
 ARG version
 ARG option
@@ -33,35 +64,11 @@ RUN <<EOF
 EOF
 
 # Download TeXLive installer and install them
-# This procedure is equivalent to install.sh script.
-RUN <<EOF
-   set -eux
+RUN sh ./install_from_net.sh ${version}
 
-   # Check final installer existence.
-   existfin=0
-   curl --retry 3 -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${version}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
-   
-   # Set download url.
-   url="ftp://tug.org/historic/systems/texlive/${version}/"
-   if [ "$existfin" -eq "0" ]; then
-      url=${url}tlnet-final/
-   fi
-   url=${url}install-tl-unx.tar.gz
 
-   curl --retry 3 --ftp-pasv -u anonymous:FTP ${url} | tar -xz --strip-components=1
-
-   # Set mirror url.
-   # We use mirror usualy to use fastest repository, but there is no mirror for older versions.
-   # So we use old versions repository reluctantly if we install older version.
-   mirrurl="http://mirror.ctan.org/systems/texlive/tlnet/"
-   reposurl=$mirrurl
-   if [ "$existfin" -eq "0" ]; then
-      reposurl="ftp://tug.org/texlive/historic/${version}/tlnet-final/"
-   fi
-
-   # You have to prepare profile.
-   ./install-tl -profile=texlive.profile -repository $reposurl
-EOF
+# Intermediate builder for multistage selection
+FROM ${builder_name} as intermediate_builder
 
 
 # Working image
@@ -69,6 +76,7 @@ FROM debian:buster-slim
 
 LABEL maintainer="kazuaki@ex-t.jp"
 
+ARG builder_name
 ARG version
 ARG arch
 
@@ -84,7 +92,7 @@ RUN <<EOF
 EOF
 
 # Copy TeXLive from builder
-COPY --from=builder /usr/local/texlive /usr/local/texlive
+COPY --from=intermediate_builder /usr/local/texlive /usr/local/texlive
 
 # Install gpg, git, xdg-utils, locales and ghostscript
 RUN <<EOF
