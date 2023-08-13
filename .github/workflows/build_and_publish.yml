@@ -92,6 +92,9 @@ jobs:
             type=raw, value=${{ matrix.version }}, enable=${{ env.DEFAULT_OPTION == matrix.option }}
             type=raw, value=${{ matrix.version }}-{{sha}}, enable=${{ env.DEFAULT_OPTION == matrix.option }}
             type=raw, value=latest, enable=${{ env.DEFAULT_OPTION == matrix.option && env.DEFAULT_VERSION == matrix.version }}
+      - name: Cleanup Docker image
+        shell: bash
+        run:  docker image prune --force
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:

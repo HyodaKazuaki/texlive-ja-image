@@ -67,6 +67,9 @@ jobs:
           uses: docker/setup-qemu-action@v2
         - name: Set up Docker Buildx
           uses: docker/setup-buildx-action@v2
+        - name: Cleanup Docker image
+          shell: bash
+          run:  docker image prune --force 
         - name: Build
           uses: docker/build-push-action@v4
           with:
