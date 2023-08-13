@@ -3,7 +3,7 @@
 # TeXLive installation script
 # Copyright 2023 HyodaKazuaki
 #
-# Usage: ./install.sh [YEAR]
+# Usage: ./install_from_net.sh [YEAR]
 # This script downloads TeXLive installer and installs them specified.
 #
 # YEAR      TeXLive version you want to install. Defaults to this year.
@@ -11,7 +11,7 @@
 # This script is released under MIT License.
 # For details, see LICENSE file.
 
-set -eu
+set -eux
 
 YEAR=${1:-`date "+%Y"`}
 
@@ -31,7 +31,7 @@ if [ "$existfin" -eq "0" ]; then
 fi
 url=${url}install-tl-unx.tar.gz
 
-curl -u anonymous:FTP ${url} | tar -xz --strip-components=1
+curl --retry 5 -u anonymous:FTP ${url} | tar -xz --strip-components=1
 
 # Set mirror url.
 # We use mirror usualy to use fastest repository, but there is no mirror for older versions.
