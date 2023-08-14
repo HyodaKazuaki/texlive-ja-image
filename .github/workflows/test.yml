@@ -24,16 +24,10 @@ jobs:
         version: [2023, 2022, 2021, 2020, 2019]
         option: ["default", "full"]
     steps:
-        - name: Maximize build disk space
-          uses: easimon/maximize-build-space@v8
+        - name: Free Disk Space (Ubuntu)
+          uses: jlumbroso/free-disk-space@v1.2.0
           with:
-            remove-dotnet: true
-            remove-android: true
-            remove-haskell: true
-            remove-codeql: true
-        - name: Cleanup Docker image
-          shell: bash
-          run:  docker image prune --force
+            tool-cache: true
         - name: Checkout
           uses: actions/checkout@v3
         - name: Check final ISO file existence
@@ -44,7 +38,7 @@ jobs:
 
             # Check final ISO file existence.
             existfin=0
-            curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/texlive.iso || existfin=$?
+            curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
 
             echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
         - name: Cache ISO file
@@ -61,7 +55,7 @@ jobs:
 
             if [ "${{ steps.final-iso.outputs.existfin }}" -eq "0" ]; then
               # Download final version from ftp.
-              curl --retry 5 -O -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet/final/texlive.iso
+              curl --retry 5 -O -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/texlive.iso
             else
               # Download latest version from mirror.
               curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
