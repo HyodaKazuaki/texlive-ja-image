@@ -94,13 +94,13 @@ EOF
 # Copy TeXLive from builder
 COPY --from=intermediate_builder /usr/local/texlive /usr/local/texlive
 
-# Install gpg, git, xdg-utils, locales and ghostscript
+# Install gnupg2, git, xdg-utils, locales and ghostscript
 RUN <<EOF
    set -eux
 
    apt-get update
    apt-get install -y \
-      gpg \
+      gnupg2 \
       git \
       xdg-utils \
       locales \
