@@ -56,8 +56,7 @@ jobs:
           set -eux
 
           # Check final ISO file existence.
-          existfin=0
-          curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
+          existfin=`curl -LI https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz -o /dev/null -w '%{http_code}\n' -s`
 
           echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
       - name: Cache ISO file
@@ -72,9 +71,9 @@ jobs:
         run: |
           set -eux
 
-          if [ "${{ steps.final-iso.outputs.existfin }}" -eq "0" ]; then
-            # Download final version from ftp.
-            curl --retry 5 -O -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/texlive.iso
+          if [ "${{ steps.final-iso.outputs.existfin }}" -eq "200" ]; then
+            # Download final version from historic archive.
+            curl -LO https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${{ matrix.version }}/texlive.iso
           else
             # Download latest version from mirror.
             curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
