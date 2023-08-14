@@ -24,60 +24,60 @@ jobs:
         version: [2023, 2022, 2021, 2020, 2019]
         option: ["default", "full"]
     steps:
-        - name: Free Disk Space (Ubuntu)
-          uses: jlumbroso/free-disk-space@v1.2.0
-          with:
-            tool-cache: true
-        - name: Checkout
-          uses: actions/checkout@v3
-        - name: Check final ISO file existence
-          id: final-iso
-          shell: bash
-          run: |
-            set -eux
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@v1.2.0
+        with:
+          tool-cache: true
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Check final ISO file existence
+        id: final-iso
+        shell: bash
+        run: |
+          set -eux
 
-            # Check final ISO file existence.
-            existfin=0
-            curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
+          # Check final ISO file existence.
+          existfin=0
+          curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
 
-            echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
-        - name: Cache ISO file
-          id: cache-iso
-          uses: actions/cache@v3
-          with:
-            path: texlive.iso
-            key: ${{ matrix.version }}-${{ steps.final-iso.outputs.existfin }}
-        - name: Download ISO file
-          if: steps.cache-iso.outputs.cache-hit != 'true' && env.INSTALL_METHOD == 'from_iso'
-          shell: bash
-          run: |
-            set -eux
+          echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
+      - name: Cache ISO file
+        id: cache-iso
+        uses: actions/cache@v3
+        with:
+          path: texlive.iso
+          key: ${{ matrix.version }}-${{ steps.final-iso.outputs.existfin }}
+      - name: Download ISO file
+        if: steps.cache-iso.outputs.cache-hit != 'true' && env.INSTALL_METHOD == 'from_iso'
+        shell: bash
+        run: |
+          set -eux
 
-            if [ "${{ steps.final-iso.outputs.existfin }}" -eq "0" ]; then
-              # Download final version from ftp.
-              curl --retry 5 -O -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/texlive.iso
-            else
-              # Download latest version from mirror.
-              curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
-            fi
-        - name: Mount ISO file
-          shell: bash
-          run: |
-            set -eux
+          if [ "${{ steps.final-iso.outputs.existfin }}" -eq "0" ]; then
+            # Download final version from ftp.
+            curl --retry 5 -O -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${{ matrix.version }}/texlive.iso
+          else
+            # Download latest version from mirror.
+            curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
+          fi
+      - name: Mount ISO file
+        shell: bash
+        run: |
+          set -eux
 
-            mkdir ${{ env.MOUNT_DIR }}
-            sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
-        - name: Setup QEMU
-          uses: docker/setup-qemu-action@v2
-        - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v2
-        - name: Build
-          uses: docker/build-push-action@v4
-          with:
-            context: .
-            build-args: |
-              builder_name=${{ env.INSTALL_METHOD }}
-              iso_dir=${{ env.MOUNT_DIR }}
-              version=${{ matrix.version }}
-              option=${{ matrix.option }}
-            push: false
+          mkdir ${{ env.MOUNT_DIR }}
+          sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          build-args: |
+            builder_name=${{ env.INSTALL_METHOD }}
+            iso_dir=${{ env.MOUNT_DIR }}
+            version=${{ matrix.version }}
+            option=${{ matrix.option }}
+          push: false
