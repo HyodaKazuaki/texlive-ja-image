@@ -78,13 +78,13 @@ jobs:
             # Download latest version from mirror.
             curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
           fi
-          - name: Mount ISO file
-          shell: bash
-          run: |
-            set -eux
+      - name: Mount ISO file
+        shell: bash
+        run: |
+          set -eux
 
-            mkdir ${{ env.MOUNT_DIR }}
-            sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
+          mkdir ${{ env.MOUNT_DIR }}
+          sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
       - name: Log in to the Container registry
