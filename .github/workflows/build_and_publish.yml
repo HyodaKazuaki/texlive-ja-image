@@ -64,7 +64,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: texlive.iso
-          key: ${{ matrix.version }}-${{ steps.final-iso.outputs.existfin }}
+          key: texlive-iso-${{ matrix.version }}-${{ steps.final-iso.outputs.existfin }}
       - name: Download ISO file
         if: steps.cache-iso.outputs.cache-hit != 'true' && env.INSTALL_METHOD == 'from_iso'
         shell: bash
@@ -78,13 +78,13 @@ jobs:
             # Download latest version from mirror.
             curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
           fi
-          - name: Mount ISO file
-          shell: bash
-          run: |
-            set -eux
+      - name: Mount ISO file
+        shell: bash
+        run: |
+          set -eux
 
-            mkdir ${{ env.MOUNT_DIR }}
-            sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
+          mkdir ${{ env.MOUNT_DIR }}
+          sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
       - name: Log in to the Container registry
