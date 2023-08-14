@@ -24,10 +24,21 @@ jobs:
         version: [2023, 2022, 2021, 2020, 2019]
         option: ["default", "full"]
     steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@v1.2.0
+      # Remove unused tools since the runner storage is oppressed by them.
+      # ref. https://github.com/orgs/community/discussions/25678
+      - name: Check disk space
+        run: df -h
+      - name: Checkout Apache Flink for disk clean-up
+        uses: actions/checkout@v3
         with:
-          tool-cache: true
+          repository: apache/flink
+          path: third_party/flink
+          ref: release-1.17.1
+      - name: Clean-up disk
+        working-directory: third_party/flink
+        run: sh ./tools/azure-pipelines/free_disk_space.sh
+      - name: Check disk space again
+        run: df -h
       - name: Checkout
         uses: actions/checkout@v3
       - name: Check final ISO file existence
