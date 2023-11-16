@@ -11,6 +11,7 @@ env:
   # Choose one from from_iso or from_net
   INSTALL_METHOD: from_iso
   MOUNT_DIR: texlive
+  PLATFORM: linux/amd64,linux/arm64
 
 defaults:
   run:
@@ -29,7 +30,7 @@ jobs:
       - name: Check disk space
         run: df -h
       - name: Checkout Apache Flink for disk clean-up
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: apache/flink
           path: third_party/flink
@@ -40,7 +41,7 @@ jobs:
       - name: Check disk space again
         run: df -h
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Check final ISO file existence
         id: final-iso
         shell: bash
@@ -79,9 +80,11 @@ jobs:
           mkdir ${{ env.MOUNT_DIR }}
           sudo mount -o loop -t iso9660 texlive.iso ${{ env.MOUNT_DIR }}
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: ${{ env.PLATFORM }}
       - name: Build
         uses: docker/build-push-action@v4
         with:
