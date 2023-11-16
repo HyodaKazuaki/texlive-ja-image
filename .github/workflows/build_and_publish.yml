@@ -113,6 +113,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: ${{ env.PLATFORM }}
           build-args: |
             builder_name=${{ env.INSTALL_METHOD }}
             iso_dir=${{ env.MOUNT_DIR }}
