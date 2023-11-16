@@ -11,7 +11,8 @@ env:
   # Choose one from from_iso or from_net
   INSTALL_METHOD: from_iso
   MOUNT_DIR: texlive
-  PLATFORM: linux/amd64,linux/arm64
+  PLATFORMS: linux/amd64,linux/arm64
+  PLATFORMS_OLD: linux/amd64
 
 defaults:
   run:
@@ -84,12 +85,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: ${{ env.PLATFORM }}
+          platforms: ${{ matrix.version == 2019 && env.PLATFORMS_OLD || env.PLATFORMS }}
       - name: Build
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: ${{ env.PLATFORM }}
+          platforms: ${{ matrix.version == 2019 && env.PLATFORMS_OLD || env.PLATFORMS }}
           build-args: |
             builder_name=${{ env.INSTALL_METHOD }}
             iso_dir=${{ env.MOUNT_DIR }}
