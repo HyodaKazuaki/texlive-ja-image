@@ -22,11 +22,11 @@ ARG option
 # Move to /tmp
 WORKDIR /tmp
 
-# Add profile
-COPY profiles/${version}/${option}/texlive.profile /tmp/
-
 # Add ISO data
 COPY ${iso_dir} /tmp
+
+# Add profile
+COPY profiles/${version}/${option}/texlive.profile /tmp/
 
 # Install dependency
 RUN <<EOF
