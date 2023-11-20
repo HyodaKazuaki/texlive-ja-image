@@ -34,11 +34,16 @@ WORKDIR /tmp/texlive
 COPY ${iso_dir} /tmp/texlive
 
 # Copy profile
-RUN DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
-   "linux/amd64") echo "amd64";; \
-   "linux/arm64") echo "arm64";; \
-   *)             echo "amd64";; esac) \
-   && cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+RUN <<EOF
+   set -eux
+   DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
+      "linux/amd64") echo "amd64";; \
+      "linux/arm64") echo "arm64";; \
+      *)             echo "amd64";; esac)
+   ls /tmp/profiles/
+   ls /tmp/profiles/${DOCKER_ARCH}/
+   cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+EOF
 
 # Install dependency
 RUN <<EOF
@@ -69,12 +74,14 @@ COPY profiles/${version}/${option}/* /tmp/profiles/
 WORKDIR /tmp/texlive
 
 # Copy profile
-RUN DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
-   "linux/amd64") echo "x86_64";; \
-   "linux/arm64") echo "aarch64";; \
-   *)             echo "x86_64";; esac); \
-   && cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
-
+RUN <<EOF
+   set -eux
+   DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
+      "linux/amd64") echo "amd64";; \
+      "linux/arm64") echo "arm64";; \
+      *)             echo "amd64";; esac)
+   cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+EOF
 
 # Add install script
 COPY install.sh /tmp/texlive/
