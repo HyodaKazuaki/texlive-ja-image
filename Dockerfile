@@ -40,9 +40,6 @@ RUN <<EOF
       "linux/amd64") echo "amd64";; \
       "linux/arm64") echo "arm64";; \
       *)             echo "amd64";; esac)
-   ls /tmp/profiles/
-   ls /tmp/profiles/
-   ls /tmp/profiles/${DOCKER_ARCH}/
    cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
 
@@ -52,6 +49,7 @@ RUN <<EOF
 
    apt-get update
    apt-get install -y perl
+   cat texlive.profile
 EOF
 
 # Install TeXLive
