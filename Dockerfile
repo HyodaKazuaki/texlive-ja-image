@@ -5,6 +5,7 @@ ARG iso_dir=texlive
 ARG version=2023
 ARG arch=x86_64-linux
 ARG option=full
+ARG TARGETPLATFORM=linux/amd64
 
 ARG USERNAME=user
 ARG GROUPNAME=user
@@ -18,15 +19,26 @@ FROM debian:buster AS from_iso
 ARG iso_dir
 ARG version
 ARG option
+ARG TARGETPLATFORM
 
-# Move to /tmp
-WORKDIR /tmp
+# Move to /tmp/profiles
+WORKDIR /tmp/profiles
+
+# Add all arch profile
+COPY profiles/${version}/${option}/* /tmp/profiles/
+
+# Move to /tmp/texlive
+WORKDIR /tmp/texlive
 
 # Add ISO data
-COPY ${iso_dir} /tmp
+COPY ${iso_dir} /tmp/texlive
 
-# Add profile
-COPY profiles/${version}/${option}/texlive.profile /tmp/
+# Copy profile
+RUN DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
+   "linux/amd64") echo "x86_64";; \
+   "linux/arm64") echo "aarch64";; \
+   *)             echo "x86_64";; esac); \
+   && cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 
 # Install dependency
 RUN <<EOF
@@ -45,15 +57,27 @@ FROM debian:buster AS from_net
 
 ARG version
 ARG option
+ARG TARGETPLATFORM
 
-# Move to /tmp
-WORKDIR /tmp
+# Move to /tmp/profiles
+WORKDIR /tmp/profiles
 
-# Add profile
-COPY profiles/${version}/${option}/texlive.profile /tmp/
+# Add all arch profile
+COPY profiles/${version}/${option}/* /tmp/profiles/
+
+# Move to /tmp/profiles
+WORKDIR /tmp/texlive
+
+# Copy profile
+RUN DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
+   "linux/amd64") echo "x86_64";; \
+   "linux/arm64") echo "aarch64";; \
+   *)             echo "x86_64";; esac); \
+   && cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+
 
 # Add install script
-COPY install.sh /tmp/
+COPY install.sh /tmp/texlive/
 
 # Install dependencies
 RUN <<EOF
