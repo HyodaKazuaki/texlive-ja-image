@@ -41,9 +41,9 @@ RUN <<EOF
       "linux/arm64") echo "arm64";; \
       *)             echo "amd64";; esac)
    ls /tmp/profiles/
-   ls /tmp/profiles/${option}/
-   ls /tmp/profiles/${option}/${DOCKER_ARCH}/
-   cp /tmp/profiles/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+   ls /tmp/profiles/
+   ls /tmp/profiles/${DOCKER_ARCH}/
+   cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
 
 # Install dependency
@@ -81,7 +81,7 @@ RUN <<EOF
       "linux/amd64") echo "amd64";; \
       "linux/arm64") echo "arm64";; \
       *)             echo "amd64";; esac)
-   cp /tmp/profiles/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+   cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
 
 # Add install script
