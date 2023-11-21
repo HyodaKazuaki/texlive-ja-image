@@ -38,7 +38,7 @@ RUN <<EOF
    set -eux
    DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
       "linux/amd64") echo "amd64";; \
-      "linux/arm64") echo "arm64";; \
+      "linux/arm64") echo "amd64";; \
       *)             echo "amd64";; esac)
    cp /tmp/profiles/${version}/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
