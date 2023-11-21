@@ -38,7 +38,7 @@ RUN <<EOF
    set -eux
    DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
       "linux/amd64") echo "amd64";; \
-      "linux/arm64") echo "amd64";; \
+      "linux/arm64") echo "arm64";; \
       *)             echo "amd64";; esac)
    cp /tmp/profiles/${version}/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
@@ -53,8 +53,10 @@ RUN <<EOF
 EOF
 
 # Install TeXLive
-RUN ./install-tl -profile=texlive.profile
-
+RUN <<EOF
+   set -eux
+   ./install-tl -profile=texlive.profile
+EOF
 
 # Build TeXLive from net
 FROM debian:buster AS from_net
