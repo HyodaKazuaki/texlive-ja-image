@@ -25,7 +25,7 @@ ARG TARGETPLATFORM
 WORKDIR /tmp/profiles
 
 # Add all arch profile
-COPY profiles/${version}/${option}/ /tmp/profiles/
+COPY profiles /tmp/profiles
 
 # Move to /tmp/texlive
 WORKDIR /tmp/texlive
@@ -40,7 +40,7 @@ RUN <<EOF
       "linux/amd64") echo "amd64";; \
       "linux/arm64") echo "arm64";; \
       *)             echo "amd64";; esac)
-   cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+   cp /tmp/profiles/${version}/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
 
 # Install dependency
@@ -67,7 +67,7 @@ ARG TARGETPLATFORM
 WORKDIR /tmp/profiles
 
 # Add all arch profile
-COPY profiles/${version}/${option}/ /tmp/profiles/
+COPY profiles /tmp/profiles
 
 # Move to /tmp/profiles
 WORKDIR /tmp/texlive
@@ -79,7 +79,7 @@ RUN <<EOF
       "linux/amd64") echo "amd64";; \
       "linux/arm64") echo "arm64";; \
       *)             echo "amd64";; esac)
-   cp /tmp/profiles/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+   cp /tmp/profiles/${version}/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
 EOF
 
 # Add install script
