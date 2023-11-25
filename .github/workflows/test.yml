@@ -9,7 +9,9 @@ on:
 
 env:
   # Choose one from from_iso or from_net
-  INSTALL_METHOD: from_iso
+  INSTALL_METHOD: from_net
+  HISTRIC_MIRROR: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive
+  ISO_MIRROR: http://mirror.ctan.org/systems/texlive/Images/texlive.iso
   MOUNT_DIR: texlive
   PLATFORMS: linux/amd64,linux/arm64
   PLATFORMS_OLD: linux/amd64
@@ -51,7 +53,7 @@ jobs:
 
           # Check final ISO file existence.
           existfin=0
-          existfin=`curl -LI https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz -o /dev/null -w '%{http_code}\n' -s`
+          existfin=`curl -LI ${{ env.HISTRIC_MIRROR }}/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz -o /dev/null -w '%{http_code}\n' -s`
 
           echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
       - name: Cache ISO file
@@ -68,10 +70,10 @@ jobs:
 
           if [ "${{ steps.final-iso.outputs.existfin }}" -eq "200" ]; then
             # Download final version from historic archive.
-            curl -LO https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${{ matrix.version }}/texlive.iso
+            curl -LO ${{ env.HISTRIC_MIRROR }}/${{ matrix.version }}/texlive.iso
           else
             # Download latest version from mirror.
-            curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
+            curl -OL ${{ env.ISO_MIRROR }}
           fi
       - name: Mount ISO file
         shell: bash
