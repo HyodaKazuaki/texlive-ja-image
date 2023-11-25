@@ -83,6 +83,7 @@ jobs:
             curl -OL ${{ env.ISO_MIRROR }}
           fi
       - name: Mount ISO file
+        if: env.INSTALL_METHOD == 'from_iso'
         shell: bash
         run: |
           set -eux
