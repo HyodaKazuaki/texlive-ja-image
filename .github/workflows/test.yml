@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
     branches:
-        - "**"
+      - "**"
   workflow_dispatch:
 
 env:
@@ -13,8 +13,7 @@ env:
   HISTRIC_MIRROR: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive
   ISO_MIRROR: http://mirror.ctan.org/systems/texlive/Images/texlive.iso
   MOUNT_DIR: texlive
-  PLATFORMS: linux/amd64,linux/arm64
-  PLATFORMS_OLD: linux/amd64
+  PLATFORMS: linux/arm64
 
 defaults:
   run:
@@ -25,7 +24,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        version: [2023, 2022, 2021, 2020, 2019]
+        version: [2023]
         option: ["default", "full"]
     steps:
       # Remove unused tools since the runner storage is oppressed by them.
@@ -87,12 +86,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: ${{ matrix.version == 2019 && env.PLATFORMS_OLD || env.PLATFORMS }}
+          platforms: ${{ env.PLATFORMS }}
       - name: Build
         uses: docker/build-push-action@v4
         with:
           context: .
-          platforms: ${{ matrix.version == 2019 && env.PLATFORMS_OLD || env.PLATFORMS }}
+          platforms: ${{ env.PLATFORMS }}
           build-args: |
             builder_name=${{ env.INSTALL_METHOD }}
             iso_dir=${{ env.MOUNT_DIR }}
