@@ -14,7 +14,7 @@
 set -eux
 
 YEAR=${1:-`date "+%Y"`}
-HISTORIC_MIRROR=ftp://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${YEAR}/
+HISTORIC_MIRROR=ftp://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${YEAR}
 
 echo "##################"
 echo "Download installer"
