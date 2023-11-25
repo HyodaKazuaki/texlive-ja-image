@@ -85,7 +85,7 @@ RUN <<EOF
 EOF
 
 # Add install script
-COPY install.sh /tmp/texlive/
+COPY install_from_net.sh /tmp/texlive/
 
 # Install dependencies
 RUN <<EOF
