@@ -13,7 +13,7 @@ env:
   HISTRIC_MIRROR: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive
   ISO_MIRROR: http://mirror.ctan.org/systems/texlive/Images/texlive.iso
   MOUNT_DIR: texlive
-  PLATFORMS: linux/arm64
+  PLATFORMS: linux/amd64,linux/arm64
 
 defaults:
   run:

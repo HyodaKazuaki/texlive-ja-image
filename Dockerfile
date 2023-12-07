@@ -5,13 +5,11 @@ ARG iso_dir=texlive
 ARG version=2023
 ARG arch=x86_64-linux
 ARG option=full
-ARG TARGETPLATFORM=linux/amd64
 
 ARG USERNAME=user
 ARG GROUPNAME=user
 ARG UID=1000
 ARG GID=1000
-
 
 # Build TeXLive from iso
 FROM debian:buster AS from_iso
