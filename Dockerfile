@@ -49,6 +49,9 @@ RUN <<EOF
    apt-get install -y perl
 EOF
 
+# Add download script
+COPY download_custom_binary.sh /tmp/texlive/
+
 # Download custom binary if target is aarch64
 RUN <<EOF
    set -eux
