@@ -12,7 +12,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   # Choose one from from_iso or from_net
-  INSTALL_METHOD: from_net
+  INSTALL_METHOD: from_iso
   HISTRIC_MIRROR: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive
   ISO_MIRROR: http://mirror.ctan.org/systems/texlive/Images/texlive.iso
   MOUNT_DIR: texlive
