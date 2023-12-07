@@ -54,7 +54,7 @@ EOF
 # Download custom binary if target is aarch64
 RUN <<EOF
    set -eux
-   if [ ${TARGETPLATFORM} -eq "linux/arm64" ]; then
+   if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
       sh ./download_custom_binary.sh ${version}
    fi
 EOF
@@ -62,7 +62,7 @@ EOF
 # Install TeXLive
 RUN <<EOF
    set -eux
-   if [ ${TARGETPLATFORM} -eq "linux/arm64" ]; then
+   if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
       ./install-tl -profile=texlive.profile --custom-bin=./custom_bin
    else
       ./install-tl -profile=texlive.profile
@@ -72,7 +72,7 @@ EOF
 # Change directory name custom to aarch64-linux if target is aarch64
 RUN <<EOF
    set -eux
-   if [ ${TARGETPLATFORM} -eq "linux/arm64" ]; then
+   if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
       mv /usr/local/texlive/${version}/bin/custom /usr/local/texlive/${version}/bin/aarch64-linux
    fi
 EOF
