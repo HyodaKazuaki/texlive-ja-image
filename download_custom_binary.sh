@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # TeXLive custom binary download script
 # Copyright 2023 HyodaKazuaki
@@ -14,11 +14,12 @@
 set -eux
 
 YEAR=${1:-`date "+%Y"`}
+YEAR=$(($YEAR + 0)) # Convert to integer.
 
 # Check the year supported.
 if [ $YEAR -lt 2019 ]; then
     echo "TeXLive version $YEAR is not supported since there is no custom binary for this version."
-    exit(1)
+    exit 1
 fi
 
 declare -A urls=(
@@ -33,10 +34,10 @@ echo "######################"
 echo "Download custom binary"
 echo "######################"
 
-mkdir -P custom_bin
+mkdir -p custom_bin
 
 cd custom_bin
 
-curl ${urls[$YEAR]} | tar -xz --strip-components=1
+curl ${urls[$YEAR]} | tar -xJ --strip-components=1
 
-echo "Download succeeded at ./custom_bin"
+echo "Download succeeded to `pwd`"

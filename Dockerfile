@@ -56,7 +56,7 @@ COPY download_custom_binary.sh /tmp/texlive/
 RUN <<EOF
    set -eux
    if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
-      sh ./download_custom_binary.sh ${version}
+      bash ./download_custom_binary.sh ${version}
    fi
 EOF
 
