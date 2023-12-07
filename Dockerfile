@@ -49,13 +49,32 @@ RUN <<EOF
 
    apt-get update
    apt-get install -y perl
-   cat texlive.profile
+EOF
+
+# Download custom binary if target is aarch64
+RUN <<EOF
+   set -eux
+   if [ ${TARGETPLATFORM} -eq "linux/arm64" ]; then
+      sh ./download_custom_binary.sh ${version}
+   fi
 EOF
 
 # Install TeXLive
 RUN <<EOF
    set -eux
-   ./install-tl -profile=texlive.profile
+   if [ ${TARGETPLATFORM} -eq "linux/arm64" ]; then
+      ./install-tl -profile=texlive.profile --custom-bin=./custom_bin
+   else
+      ./install-tl -profile=texlive.profile
+   fi
+EOF
+
+# Change directory name custom to aarch64-linux if target is aarch64
+RUN <<EOF
+   set -eux
+   if [ ${TARGETPLATFORM} -eq "linux/arm64" ]; then
+      mv /usr/local/texlive/${version}/bin/custom /usr/local/texlive/${version}/bin/aarch64-linux
+   fi
 EOF
 
 # Build TeXLive from net
@@ -150,7 +169,9 @@ ENV LANG ja_JP.UTF-8
 USER ${USERNAME}
 
 # Add TeXLive to PATH
-ENV PATH="/usr/local/texlive/${version}/bin/${arch}:${PATH}"
+# For multi-architecture support, duplicate PATH
+ENV PATH="/usr/local/texlive/${version}/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/${version}/bin/aarch64-linux:${PATH}"
 
 # Set workspace for devcontainer
 WORKDIR /workspace
