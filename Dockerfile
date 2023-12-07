@@ -46,7 +46,7 @@ RUN <<EOF
    set -eux
 
    apt-get update
-   apt-get install -y perl xz-utils
+   apt-get install -y curl xz-utils perl
 EOF
 
 # Add download script
