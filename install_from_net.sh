@@ -14,7 +14,7 @@
 set -eux
 
 YEAR=${1:-`date "+%Y"`}
-
+HISTORIC_MIRROR=ftp://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${YEAR}
 
 echo "##################"
 echo "Download installer"
@@ -22,10 +22,10 @@ echo "##################"
 
 # Check final installer existence.
 existfin=0
-curl -s -LI -u anonymous:FTP ftp://tug.org/historic/systems/texlive/${YEAR}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
+curl -s -LI -u anonymous:FTP ${HISTORIC_MIRROR}/tlnet-final/install-tl-unx.tar.gz || existfin=$?
 
 # Set download url.
-url="ftp://tug.org/historic/systems/texlive/${YEAR}/"
+url="${HISTORIC_MIRROR}/"
 if [ "$existfin" -eq "0" ]; then
     url=${url}tlnet-final/
 fi
@@ -39,7 +39,7 @@ curl --retry 5 -u anonymous:FTP ${url} | tar -xz --strip-components=1
 mirrurl="http://mirror.ctan.org/systems/texlive/tlnet/"
 reposurl=$mirrurl
 if [ "$existfin" -eq "0" ]; then
-    reposurl="ftp://tug.org/texlive/historic/${YEAR}/tlnet-final/"
+    reposurl="${HISTORIC_MIRROR}/tlnet-final/"
 fi
 
 echo "#######"

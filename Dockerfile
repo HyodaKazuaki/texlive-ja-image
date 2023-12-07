@@ -11,49 +11,101 @@ ARG GROUPNAME=user
 ARG UID=1000
 ARG GID=1000
 
-
 # Build TeXLive from iso
 FROM debian:buster AS from_iso
 
 ARG iso_dir
 ARG version
 ARG option
+ARG TARGETPLATFORM
 
-# Move to /tmp
-WORKDIR /tmp
+# Move to /tmp/profiles
+WORKDIR /tmp/profiles
 
-# Add profile
-COPY profiles/${version}/${option}/texlive.profile /tmp/
+# Add all arch profile
+COPY profiles /tmp/profiles
+
+# Move to /tmp/texlive
+WORKDIR /tmp/texlive
 
 # Add ISO data
-COPY ${iso_dir} /tmp
+COPY ${iso_dir} /tmp/texlive
+
+# Copy profile
+RUN <<EOF
+   set -eux
+   DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
+      "linux/amd64") echo "amd64";; \
+      "linux/arm64") echo "arm64";; \
+      *)             echo "amd64";; esac)
+   cp /tmp/profiles/${version}/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+EOF
 
 # Install dependency
 RUN <<EOF
    set -eux
 
    apt-get update
-   apt-get install -y perl
+   apt-get install -y curl xz-utils perl
+EOF
+
+# Add download script
+COPY download_custom_binary.sh /tmp/texlive/
+
+# Download custom binary if target is aarch64
+RUN <<EOF
+   set -eux
+   if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
+      bash ./download_custom_binary.sh ${version}
+   fi
 EOF
 
 # Install TeXLive
-RUN ./install-tl -profile=texlive.profile
+RUN <<EOF
+   set -eux
+   if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
+      ./install-tl -profile=texlive.profile --custom-bin=./custom_bin
+   else
+      ./install-tl -profile=texlive.profile
+   fi
+EOF
 
+# Change directory name custom to aarch64-linux if target is aarch64
+RUN <<EOF
+   set -eux
+   if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then
+      mv /usr/local/texlive/${version}/bin/custom /usr/local/texlive/${version}/bin/aarch64-linux
+   fi
+EOF
 
 # Build TeXLive from net
 FROM debian:buster AS from_net
 
 ARG version
 ARG option
+ARG TARGETPLATFORM
 
-# Move to /tmp
-WORKDIR /tmp
+# Move to /tmp/profiles
+WORKDIR /tmp/profiles
 
-# Add profile
-COPY profiles/${version}/${option}/texlive.profile /tmp/
+# Add all arch profile
+COPY profiles /tmp/profiles
+
+# Move to /tmp/profiles
+WORKDIR /tmp/texlive
+
+# Copy profile
+RUN <<EOF
+   set -eux
+   DOCKER_ARCH=$(case ${TARGETPLATFORM} in \
+      "linux/amd64") echo "amd64";; \
+      "linux/arm64") echo "arm64";; \
+      *)             echo "amd64";; esac)
+   cp /tmp/profiles/${version}/${option}/${DOCKER_ARCH}/texlive.profile /tmp/texlive/
+EOF
 
 # Add install script
-COPY install.sh /tmp/
+COPY install_from_net.sh /tmp/texlive/
 
 # Install dependencies
 RUN <<EOF
@@ -118,7 +170,9 @@ ENV LANG ja_JP.UTF-8
 USER ${USERNAME}
 
 # Add TeXLive to PATH
-ENV PATH="/usr/local/texlive/${version}/bin/${arch}:${PATH}"
+# For multi-architecture support, duplicate PATH
+ENV PATH="/usr/local/texlive/${version}/bin/x86_64-linux:${PATH}"
+ENV PATH="/usr/local/texlive/${version}/bin/aarch64-linux:${PATH}"
 
 # Set workspace for devcontainer
 WORKDIR /workspace

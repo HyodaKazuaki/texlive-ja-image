@@ -4,14 +4,16 @@ on:
   push:
   pull_request:
     branches:
-        - "**"
+      - "**"
   workflow_dispatch:
 
 env:
   # Choose one from from_iso or from_net
   INSTALL_METHOD: from_iso
+  HISTRIC_MIRROR: https://ftp.math.utah.edu/pub/tex/historic/systems/texlive
+  ISO_MIRROR: http://mirror.ctan.org/systems/texlive/Images/texlive.iso
   MOUNT_DIR: texlive
-  PLATFORM: linux/amd64,linux/arm64
+  PLATFORMS: linux/amd64,linux/arm64
 
 defaults:
   run:
@@ -22,7 +24,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        version: [2023, 2022, 2021, 2020, 2019]
+        version: ["2023", "2022", "2021", "2020", "2019"]
         option: ["default", "full"]
     steps:
       # Remove unused tools since the runner storage is oppressed by them.
@@ -50,7 +52,7 @@ jobs:
 
           # Check final ISO file existence.
           existfin=0
-          existfin=`curl -LI https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz -o /dev/null -w '%{http_code}\n' -s`
+          existfin=`curl -LI ${{ env.HISTRIC_MIRROR }}/${{ matrix.version }}/tlnet-final/install-tl-unx.tar.gz -o /dev/null -w '%{http_code}\n' -s`
 
           echo "existfin=${existfin}" >> "$GITHUB_OUTPUT"
       - name: Cache ISO file
@@ -67,12 +69,13 @@ jobs:
 
           if [ "${{ steps.final-iso.outputs.existfin }}" -eq "200" ]; then
             # Download final version from historic archive.
-            curl -LO https://ftp.math.utah.edu/pub/tex/historic/systems/texlive/${{ matrix.version }}/texlive.iso
+            curl -LO ${{ env.HISTRIC_MIRROR }}/${{ matrix.version }}/texlive.iso
           else
             # Download latest version from mirror.
-            curl -OL http://mirror.ctan.org/systems/texlive/Images/texlive.iso
+            curl -OL ${{ env.ISO_MIRROR }}
           fi
       - name: Mount ISO file
+        if: env.INSTALL_METHOD == 'from_iso'
         shell: bash
         run: |
           set -eux
@@ -84,11 +87,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          platforms: ${{ env.PLATFORM }}
+          platforms: ${{ env.PLATFORMS }}
       - name: Build
         uses: docker/build-push-action@v4
         with:
           context: .
+          platforms: ${{ env.PLATFORMS }}
           build-args: |
             builder_name=${{ env.INSTALL_METHOD }}
             iso_dir=${{ env.MOUNT_DIR }}
