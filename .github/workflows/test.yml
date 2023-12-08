@@ -42,6 +42,8 @@ jobs:
         run: sh ./tools/azure-pipelines/free_disk_space.sh
       - name: Check disk space again
         run: df -h
+      - name: Remove docker extra data
+        run: docker system prune --force
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check final ISO file existence
