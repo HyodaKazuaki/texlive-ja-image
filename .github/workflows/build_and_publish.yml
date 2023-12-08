@@ -48,10 +48,10 @@ jobs:
       - name: Clean-up disk
         working-directory: third_party/flink
         run: sh ./tools/azure-pipelines/free_disk_space.sh
+      - name: Remove docker extra data
+        run: docker rmi $(docker images -q -a)
       - name: Check disk space again
         run: df -h
-      - name: Remove docker extra data
-        run: docker system prune --force
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check final ISO file existence
