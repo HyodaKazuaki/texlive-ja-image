@@ -50,6 +50,8 @@ jobs:
         run: docker rmi $(docker images -q -a)
       - name: Check disk space again
         run: df -h
+      - name: Listing 100 largest packages
+        run: dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check final ISO file existence
