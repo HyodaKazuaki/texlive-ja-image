@@ -56,8 +56,16 @@ jobs:
         run: sudo du -h --max-depth=1 / | sort -rh | head -n 100 || true
       - name: Listing 100 largest directories from /opt
         run: sudo du -h --max-depth=1 /opt | sort -rh | head -n 100 || true
+      - name: Listing 100 largest directories from /opt/hostedtoolcache
+        run: sudo du -h --max-depth=1 /opt/hostedtoolcache | sort -rh | head -n 100 || true
       - name: Listing 100 largest directories from /usr
         run: sudo du -h --max-depth=1 /usr | sort -rh | head -n 100 || true
+      - name: Listing 100 largest directories from /usr/lib
+        run: sudo du -h --max-depth=1 /usr/lib | sort -rh | head -n 100 || true
+      - name: Listing 100 largest directories from /usr/share
+        run: sudo du -h --max-depth=1 /usr/share | sort -rh | head -n 100 || true
+      - name: Listing 100 largest directories from /usr/local
+        run: sudo du -h --max-depth=1 /usr/local | sort -rh | head -n 100 || true
       - name: Checkout
         uses: actions/checkout@v4
       - name: Check final ISO file existence
