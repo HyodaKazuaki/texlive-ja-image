@@ -52,6 +52,22 @@ jobs:
         run: rm -r third_party/flink
       - name: Remove docker extra data
         run: docker rmi $(docker images -q -a)
+      - name: Remove large directries from /opt/hostcaches
+        run: |
+          sudo rm -rf /opt/hostcaches/CodeQL
+          sudo rm -rf /opt/hostcaches/Python
+          sudo rm -rf /opt/hostcaches/go
+          sudo rm -rf /opt/hostcaches/PyPy
+          sudo rm -rf /opt/hostcaches/node
+          sudo rm -rf /opt/hostcaches/Ruby
+      - name: Remove large directries from /usr/lib
+        run: |
+          sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /usr/lib/google-cloud-sdk
+          sudo rm -rf /usr/lib/mono
+          sudo rm -rf /usr/lib/heroku
+          sudo rm -rf /usr/lib/firefox
+          sudo rm -rf /usr/lib/python3
       - name: Check disk space again
         run: df -h
       - name: Checkout
