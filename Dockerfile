@@ -156,7 +156,8 @@ RUN <<EOF
       git \
       xdg-utils \
       locales \
-      ghostscript
+      ghostscript \
+      libyaml-tiny-perl
    rm -rf /var/lib/apt/lists/*
 
    # generate Japanese locale
