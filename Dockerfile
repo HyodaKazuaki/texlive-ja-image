@@ -157,6 +157,8 @@ RUN <<EOF
       xdg-utils \
       locales \
       ghostscript \
+      perl \
+      libfile-homedir-perl \
       libyaml-tiny-perl
    rm -rf /var/lib/apt/lists/*
 
